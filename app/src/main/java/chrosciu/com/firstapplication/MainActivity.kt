@@ -1,52 +1,41 @@
 package chrosciu.com.firstapplication
 
+import android.media.AudioManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-
 import kotlinx.android.synthetic.main.activity_main.*
-import android.media.AudioManager
-import android.widget.TextView
-import android.widget.ToggleButton
+import kotlinx.android.synthetic.main.content_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var audioManager: AudioManager? = null
-    private var textView: TextView? = null
-    private var toggleButton: ToggleButton? = null
+    private val audioManager:AudioManager by lazy {getSystemService(AUDIO_SERVICE) as AudioManager}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        initReferences()
         readRingerMode()
         handleToggleButton()
     }
 
-    private fun initReferences() {
-        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        textView = findViewById<TextView>(R.id.textView)
-        toggleButton = findViewById<ToggleButton>(R.id.toggleButton)
-    }
-
     private fun readRingerMode() {
-        displayRingerMode(audioManager!!.ringerMode)
+        displayRingerMode(audioManager.ringerMode)
     }
 
     private fun setRingerMode(ringerMode: Int) {
-        audioManager!!.ringerMode = ringerMode
+        audioManager.ringerMode = ringerMode
         displayRingerMode(ringerMode)
     }
 
     private fun displayRingerMode(ringerMode: Int) {
-        textView!!.text = ringerMode.toString()
+        textView.text = ringerMode.toString()
     }
 
     private fun handleToggleButton() {
-        toggleButton!!.setOnCheckedChangeListener({ _, isChecked ->
+        toggleButton.setOnCheckedChangeListener({ _, isChecked ->
             setRingerMode(if (isChecked) AudioManager.RINGER_MODE_VIBRATE else AudioManager.RINGER_MODE_NORMAL)
         })
     }
