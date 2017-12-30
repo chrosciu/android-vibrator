@@ -1,6 +1,7 @@
 package chrosciu.com.firstapplication
 
 import android.media.AudioManager
+import android.media.AudioManager.*
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleToggleButton() {
         toggleButton.setOnCheckedChangeListener({ _, isChecked ->
-            setRingerMode(if (isChecked) AudioManager.RINGER_MODE_VIBRATE else AudioManager.RINGER_MODE_NORMAL)
+            setRingerMode(if (isChecked) RINGER_MODE_VIBRATE else RINGER_MODE_NORMAL)
         })
     }
 
