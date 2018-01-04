@@ -1,13 +1,17 @@
 package chrosciu.com.firstapplication
 
+import android.annotation.SuppressLint
 import android.media.AudioManager
 import android.media.AudioManager.*
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
+import android.support.v4.app.ActivityCompat.startActivityForResult
+import android.content.Intent
+import android.content.Context.AUDIO_SERVICE
+import android.content.Context.NOTIFICATION_SERVICE
+import android.app.NotificationManager
+import android.content.Context
 
 
 class MainActivity : AppCompatActivity() {
@@ -17,43 +21,45 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        askForPermission()
         readRingerMode()
-        handleToggleButton()
+        handleRadioGroup()
+    }
+
+    @SuppressLint("NewApi")
+    private fun askForPermission() {
+        val n = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (!n.isNotificationPolicyAccessGranted) {
+            val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+            startActivityForResult(intent, 0)
+        }
     }
 
     private fun readRingerMode() {
-        displayRingerMode(audioManager.ringerMode)
+        initRadios(audioManager.ringerMode)
     }
 
     private fun setRingerMode(ringerMode: Int) {
         audioManager.ringerMode = ringerMode
-        displayRingerMode(ringerMode)
     }
 
-    private fun displayRingerMode(ringerMode: Int) {
-        textView.text = ringerMode.toString()
+    private fun handleRadioGroup() {
+        radioGroup.setOnCheckedChangeListener { radioGroup, i ->
+            val ringerMode = when(i) {
+                R.id.radio1 -> RINGER_MODE_NORMAL
+                R.id.radio2 -> RINGER_MODE_VIBRATE
+                R.id.radio3 -> RINGER_MODE_SILENT
+                else -> RINGER_MODE_NORMAL
+            }
+            setRingerMode(ringerMode)
+        }
     }
 
-    private fun handleToggleButton() {
-        toggleButton.setOnCheckedChangeListener({ _, isChecked ->
-            setRingerMode(if (isChecked) RINGER_MODE_VIBRATE else RINGER_MODE_NORMAL)
-        })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
+    private fun initRadios(ringerMode: Int) {
+        when(ringerMode) {
+            RINGER_MODE_NORMAL -> {radio1.isChecked = true}
+            RINGER_MODE_VIBRATE -> {radio2.isChecked = true}
+            RINGER_MODE_SILENT -> {radio3.isChecked = true}
         }
     }
 }
